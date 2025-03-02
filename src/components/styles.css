@@ -1,0 +1,27 @@
+.dark-mode, .modal {
+    color: #ffffff !important;
+}
+
+.light-mode,.modal {
+    color: #333 !important;
+}
+
+.light-mode .bg-light {
+    background-color: #ffffff !important;
+}
+
+/*.dark-mode .list-group-item {
+    background-color: #333 !important;
+    color: #ffffff !important;
+    border-color: #333 !important;
+}*/
+
+body, .bg-light, .light-mode {
+    background-color: #ffffff !important;
+    transition: background-color 0.3s ease;
+}
+
+body, .bg-light, .dark-mode {
+    background-color: #333 !important;
+    transition: background-color 0.3s ease;
+}
