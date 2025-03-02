@@ -32,7 +32,7 @@ export default function ViewFormFills({ formId, setViewingFills }) {
         } catch (error) {
             console.error("Error fetching form fills:", error);
         }
-    }, [formId]); // Csak akkor fut újra, ha `formId` változik
+    }, [formId]);
 
     useEffect(() => {
         fetchFills();
