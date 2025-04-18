@@ -50,15 +50,19 @@ export default function UserDashboard({ user }) {
         } catch (error) {
             console.error("Logout failed", error);
         }
-        //localStorage.removeItem("token");
         document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
         window.location.href = "/";
     };
 
     return (
-        <div className={darkMode ? "dark-mode" : "light-mode"}>
+        <div className={`${darkMode ? "dark-mode" : "light-mode"}`} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh'
+        }}>
+            {/* Navbar with dropdowns - removed overflow constraints here */}
             <Navbar bg={darkMode ? "dark" : "light"} variant={darkMode ? "dark" : "light"} expand="lg" className="shadow">
-                <Container>
+                <Container fluid>  {/* Changed to fluid to prevent horizontal cutoff */}
                     <Navbar.Brand href="#" onClick={() => setView("welcome")}>{t("home")}</Navbar.Brand>
                     <Nav className="ms-auto d-flex align-items-center">
                         <Button variant="link" onClick={() => setView("forms")}>{t("forms")}</Button>
@@ -68,7 +72,7 @@ export default function UserDashboard({ user }) {
                         <Button variant={darkMode ? "secondary" : "outline-dark"} onClick={toggleDarkMode}>
                             {darkMode ? "☀ " + t("lightMode") : "🌙 " + t("darkMode")}
                         </Button>
-                        <Dropdown className="ms-3">
+                        <Dropdown className="ms-3" align="end">
                             <Dropdown.Toggle variant={darkMode ? "secondary" : "primary"}>
                                 🌍 {t("language")}
                             </Dropdown.Toggle>
@@ -77,7 +81,7 @@ export default function UserDashboard({ user }) {
                                 <Dropdown.Item onClick={() => changeLanguage("hu")}>🇭🇺 Magyar</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
-                        <Dropdown className="ms-3">
+                        <Dropdown className="ms-3" align="end">
                             <Dropdown.Toggle variant={darkMode ? "secondary" : "primary"}>
                                 {user.name}
                             </Dropdown.Toggle>
@@ -90,7 +94,16 @@ export default function UserDashboard({ user }) {
                     </Nav>
                 </Container>
             </Navbar>
-            <div className="d-flex justify-content-center align-items-center vh-100">
+
+            {/* Scrollable content area */}
+            <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '20px 0',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start'
+            }}>
                 {view === "welcome" && (
                     <Card className={`p-4 shadow-lg border-0 rounded-4 ${darkMode ? "bg-dark text-white" : "bg-light text-dark"}`} style={{ width: "700px" }}>
                         <h1>{t("welcome")}, {user.name}!</h1>

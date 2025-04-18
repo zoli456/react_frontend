@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./locales/i18n";
 
@@ -12,6 +13,8 @@ export default function AuthForm({ onLogin }) {
     const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
     const [isLogin, setIsLogin] = useState(true);
     const [message, setMessage] = useState({ type: "", text: "" });
+    const [captchaToken, setCaptchaToken] = useState(null);
+    const captchaRef = useRef(null);
 
     useEffect(() => {
         // Load language from localStorage
@@ -28,8 +31,21 @@ export default function AuthForm({ onLogin }) {
         setForm((prevForm) => ({ ...prevForm, [e.target.name]: e.target.value }));
     };
 
+    const handleCaptchaVerify = (token) => {
+        setCaptchaToken(token);
+    };
+
+    const handleCaptchaExpire = () => {
+        setCaptchaToken(null);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!captchaToken) {
+            setMessage({ type: "danger", text: t("completeCaptcha") });
+            return;
+        }
 
         if (!isLogin && form.password !== form.confirmPassword) {
             setMessage({ type: "danger", text: t("passwordMismatch") });
@@ -45,7 +61,10 @@ export default function AuthForm({ onLogin }) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    hcaptchaToken: captchaToken
+                }),
             });
 
             const data = await response.json();
@@ -56,6 +75,8 @@ export default function AuthForm({ onLogin }) {
 
             setMessage({ type: "success", text: data.message });
             setForm({ name: "", email: "", password: "", confirmPassword: "" });
+            setCaptchaToken(null);
+            captchaRef.current.resetCaptcha();
 
             if (isLogin && data.token) {
                 document.cookie = `token=${data.token}; path=/; secure`;
@@ -63,6 +84,8 @@ export default function AuthForm({ onLogin }) {
             }
         } catch (error) {
             setMessage({ type: "danger", text: error.message });
+            captchaRef.current.resetCaptcha();
+            setCaptchaToken(null);
         }
     };
 
@@ -122,11 +145,27 @@ export default function AuthForm({ onLogin }) {
                             />
                         </Form.Group>
                     )}
+
+                    {/* hCaptcha moved to the middle of the form */}
+                    <div className="mb-3 d-flex justify-content-center">
+                        <HCaptcha
+                            sitekey={process.env.REACT_APP_HCAPTCHA_SITE_KEY}
+                            onVerify={handleCaptchaVerify}
+                            onExpire={handleCaptchaExpire}
+                            ref={captchaRef}
+                        />
+                    </div>
+
                     <Button variant="primary" type="submit">{isLogin ? t("login") : t("register")}</Button>
-                    <Button variant="link" onClick={() => setIsLogin(!isLogin)}>
+                    <Button variant="link" onClick={() => {
+                        setIsLogin(!isLogin);
+                        captchaRef.current.resetCaptcha();
+                        setCaptchaToken(null);
+                    }}>
                         {isLogin ? t("needAccount") : t("haveAccount")}
                     </Button>
                 </Form>
+
             </Card>
 
             {/* Language Selector Below the Card */}

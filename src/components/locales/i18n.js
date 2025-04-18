@@ -45,7 +45,8 @@ const resources = {
             edit: "Edit",
             delete: "Delete",
             answers: "Answers",
-            create_form: "+ Create Form"
+            create_form: "+ Create Form",
+            completeCaptcha: "Please complete the captcha verification"
         }
     },
     hu: {
@@ -91,7 +92,8 @@ const resources = {
             edit: "Szerkeszt",
             delete: "Törlés",
             answers: "Válaszok",
-            create_form: "+ Űrlap készítés"
+            create_form: "+ Űrlap készítés",
+            completeCaptcha: "Kérlek, teljesítsd a captcha ellenőrzést"
         }
     }
 };
