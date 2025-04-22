@@ -146,7 +146,6 @@ export default function AuthForm({ onLogin }) {
                         </Form.Group>
                     )}
 
-                    {/* hCaptcha moved to the middle of the form */}
                     <div className="mb-3 d-flex justify-content-center">
                         <HCaptcha
                             sitekey={process.env.REACT_APP_HCAPTCHA_SITE_KEY}

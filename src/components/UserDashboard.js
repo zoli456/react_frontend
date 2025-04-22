@@ -60,9 +60,8 @@ export default function UserDashboard({ user }) {
             flexDirection: 'column',
             minHeight: '100vh'
         }}>
-            {/* Navbar with dropdowns - removed overflow constraints here */}
             <Navbar bg={darkMode ? "dark" : "light"} variant={darkMode ? "dark" : "light"} expand="lg" className="shadow">
-                <Container fluid>  {/* Changed to fluid to prevent horizontal cutoff */}
+                <Container fluid>
                     <Navbar.Brand href="#" onClick={() => setView("welcome")}>{t("home")}</Navbar.Brand>
                     <Nav className="ms-auto d-flex align-items-center">
                         <Button variant="link" onClick={() => setView("forms")}>{t("forms")}</Button>
