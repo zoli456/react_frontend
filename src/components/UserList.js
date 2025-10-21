@@ -38,11 +38,6 @@ export default function UserList({ }) {
         fetchUsers();
     }, [fetchUsers]);
 
-
-   /* useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);*/
-
     const handleUserUpdate = () => {
         fetchUsers();
     };
