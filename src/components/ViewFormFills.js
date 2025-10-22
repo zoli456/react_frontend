@@ -58,8 +58,8 @@ export default function ViewFormFills({ formId, setViewingFills }) {
     );
 
     return (
-        <Card className="p-4 shadow-lg border-0 rounded-4" style={{ width: "700px" }}>
-            {selectedFill ? (
+        <Card className="p-4 shadow-lg border-0 rounded-4" style={{ maxWidth: "700px", width: "100%", overflowX: "hidden" }}>
+        {selectedFill ? (
                 <div>
                     <h3>Submission by {selectedFill.userName}</h3>
                     <ul className="list-group">
