@@ -50,10 +50,10 @@ export default function FillForm({ selectedForm, setSelectedForm }) {
         if (e) e.preventDefault();
         if (submitting) return; // Prevent multiple submissions
 
-        if (!Object.keys(formData).length) {
+        /*if (!Object.keys(formData).length) {
             alert("You must fill out at least one field before submitting.");
             return;
-        }
+        }*/
 
         setSubmitting(true);
 

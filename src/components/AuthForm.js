@@ -4,6 +4,7 @@ import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./locales/i18n";
@@ -14,10 +15,10 @@ export default function AuthForm({ onLogin }) {
     const [isLogin, setIsLogin] = useState(true);
     const [message, setMessage] = useState({ type: "", text: "" });
     const [captchaToken, setCaptchaToken] = useState(null);
+    const [loading, setLoading] = useState(false);
     const captchaRef = useRef(null);
 
     useEffect(() => {
-        // Load language from localStorage
         const savedLanguage = localStorage.getItem("language") || "en";
         i18n.changeLanguage(savedLanguage);
     }, [i18n]);
@@ -53,14 +54,17 @@ export default function AuthForm({ onLogin }) {
         }
 
         const { confirmPassword, ...formData } = form;
-        const endpoint = isLogin ? `${process.env.REACT_APP_BASE_URL}/api/login` : `${process.env.REACT_APP_BASE_URL}/api/register`;
+        const endpoint = isLogin
+            ? `${process.env.REACT_APP_BASE_URL}/api/login`
+            : `${process.env.REACT_APP_BASE_URL}/api/register`;
+
+        setLoading(true); // <-- start loading
+        setMessage({ type: "", text: "" });
 
         try {
             const response = await fetch(endpoint, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
                     hcaptchaToken: captchaToken
@@ -86,6 +90,8 @@ export default function AuthForm({ onLogin }) {
             setMessage({ type: "danger", text: error.message });
             captchaRef.current.resetCaptcha();
             setCaptchaToken(null);
+        } finally {
+            setLoading(false); // <-- stop loading
         }
     };
 
@@ -110,6 +116,7 @@ export default function AuthForm({ onLogin }) {
                                 value={form.name}
                                 onChange={handleChange}
                                 required
+                                disabled={loading}
                             />
                         </Form.Group>
                     )}
@@ -121,6 +128,7 @@ export default function AuthForm({ onLogin }) {
                             value={form.email}
                             onChange={handleChange}
                             required
+                            disabled={loading}
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">
@@ -131,6 +139,7 @@ export default function AuthForm({ onLogin }) {
                             value={form.password}
                             onChange={handleChange}
                             required
+                            disabled={loading}
                         />
                     </Form.Group>
                     {!isLogin && (
@@ -142,6 +151,7 @@ export default function AuthForm({ onLogin }) {
                                 value={form.confirmPassword}
                                 onChange={handleChange}
                                 required
+                                disabled={loading}
                             />
                         </Form.Group>
                     )}
@@ -155,24 +165,52 @@ export default function AuthForm({ onLogin }) {
                         />
                     </div>
 
-                    <Button variant="primary" type="submit">{isLogin ? t("login") : t("register")}</Button>
-                    <Button variant="link" onClick={() => {
-                        setIsLogin(!isLogin);
-                        captchaRef.current.resetCaptcha();
-                        setCaptchaToken(null);
-                    }}>
-                        {isLogin ? t("needAccount") : t("haveAccount")}
-                    </Button>
-                </Form>
+                    <div className="d-flex flex-column align-items-center">
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            disabled={loading}
+                            className="w-100"
+                        >
+                            {loading ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="me-2"
+                                    />
+                                    {isLogin ? t("loggingIn") : t("registering")}
+                                </>
+                            ) : (
+                                isLogin ? t("login") : t("register")
+                            )}
+                        </Button>
 
+                        <Button
+                            variant="link"
+                            onClick={() => {
+                                setIsLogin(!isLogin);
+                                captchaRef.current.resetCaptcha();
+                                setCaptchaToken(null);
+                                setMessage({ type: "", text: "" });
+                            }}
+                            disabled={loading}
+                            className="mt-2"
+                        >
+                            {isLogin ? t("needAccount") : t("haveAccount")}
+                        </Button>
+                    </div>
+                </Form>
             </Card>
 
-            {/* Language Selector Below the Card */}
             <div className="mt-3">
-                <Button variant="secondary" size="sm" onClick={() => changeLanguage("en")}>
+                <Button variant="secondary" size="sm" onClick={() => changeLanguage("en")} disabled={loading}>
                     English
                 </Button>
-                <Button variant="secondary" size="sm" className="ms-2" onClick={() => changeLanguage("hu")}>
+                <Button variant="secondary" size="sm" className="ms-2" onClick={() => changeLanguage("hu")} disabled={loading}>
                     Magyar
                 </Button>
             </div>
